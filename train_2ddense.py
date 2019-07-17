@@ -36,7 +36,7 @@ args = parser.parse_args()
 MEAN = args.mean
 thread_num = args.thread_num
 
-liverlist = [32,34,38,41,47,87,89,91,105,106,114,115,119]
+#liverlist = [32,34,38,41,47,87,89,91,105,106,114,115,119]
 def load_seq_crop_data_masktumor_try(Parameter_List):
     img = Parameter_List[0]
     tumor = Parameter_List[1]
@@ -109,7 +109,7 @@ def generate_arrays_from_file(batch_size, trainidx, img_list, tumor_list, tumorl
             minindex = minindex_list[count]
             maxindex = maxindex_list[count]
             num = np.random.randint(0,6)
-            if num < 3 or (count in liverlist):
+            if num < 3: #or (count in liverlist):
                 lines = liverlines[count]
                 numid = liveridx[count]
             else:
