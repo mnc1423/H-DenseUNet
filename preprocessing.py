@@ -28,6 +28,9 @@ def generate_livertxt(image_path, save_folder):
 
     for i in range(0,131):
         livertumor, header = load(image_path+'segmentation-'+str(i)+'.nii')
+        print(liver.s)
+
+        np.
         f = open('data/' +save_folder+'/LiverPixels/liver_' + str(i) + '.txt', 'w')
         index = np.where(livertumor==1)
         x = index[0]

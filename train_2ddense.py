@@ -139,7 +139,11 @@ def load_fast_files(args):
     liverlines = []
     for idx in xrange(131):
         img, img_header = load(args.data+ '/myTrainingData/volume-' + str(idx) + '.nii')
+        print(img_liver.shape)
+        print(img_kidney.shape)
+        
         tumor, tumor_header = load(args.data + '/myTrainingData/segmentation-' + str(idx) + '.nii')
+
         img_list.append(img)
         tumor_list.append(tumor)
 
