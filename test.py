@@ -57,6 +57,7 @@ def predict(args):
         #  load liver mask
         mask, mask_header = load(args.liver_path + str(id) + '-ori.nii')
         mask[mask==2]=1
+        
         mask = ndimage.binary_dilation(mask, iterations=1).astype(mask.dtype)
         index = np.where(mask==1)
         mini = np.min(index, axis = -1)

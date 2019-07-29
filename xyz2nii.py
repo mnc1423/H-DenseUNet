@@ -53,7 +53,7 @@ def xyz2nii(input_xyz_file, output_nii_file='', origin=[], pad=10):
 
     # Write output image volume:
     if not output_nii_file:
-        output_nii_file = os.path.join(os.getcwd(), 'xyz.nii.gz')
+        output_nii_file = os.path.join(os.getcwd(), 'xyz.nii')
     img = nb.Nifti1Image(data, affine=np.eye(4,4))
     img.to_filename(output_nii_file)
 
