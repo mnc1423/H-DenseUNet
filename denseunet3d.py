@@ -426,7 +426,6 @@ def denseunet_3d(args):
     feature3d, classifer3d = DenseNet3D(input3d, reduction=0.5)
 
     final = add([feature3d, fea2d])
-
     final_conv = Conv3D(64, (3, 3, 3), padding="same", name='fianl_conv')(final)
     final_conv = Dropout(rate=0.1)(final_conv)
     final_bn = BatchNormalization(name="final_bn")(final_conv)
