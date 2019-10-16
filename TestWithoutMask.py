@@ -31,7 +31,7 @@ parser.add_argument('-input_cols', type=int, default=8)
 #  data augment
 parser.add_argument('-mean', type=int, default=48)
 #
-parser.add_argument('-thres_liver', type=float, default=0.5)
+parser.add_argument('-thres_liver', type=float, default=0.6)
 parser.add_argument('-thres_tumor', type=float, default=0.9)
 args = parser.parse_args()
 
