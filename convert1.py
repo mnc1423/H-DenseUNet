@@ -24,7 +24,7 @@ def convert(args):
         img = np.array(img, dtype='float32')
         print(img.shape)
         #data_reshape = np.array(data_reshape, dtype='float32')
-        print("Save image " + file)
+        print("Save image: " + file)
         save(img, args.save_path + file)
 
 
