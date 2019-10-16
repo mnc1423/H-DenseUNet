@@ -19,14 +19,8 @@ def convert(args):
     for file in filelist:
         img = nib.load('converted/'+ file).get_data()
         print(img.shape)
-
-        #img = np.swapaxes(img, 0, 2)
         img = np.array(img, dtype='float32')
-        print(img.shape)
-        #data_reshape = np.array(data_reshape, dtype='float32')
-        #print("Save image " + file)
-       # save(img, args.save_path + file)
-
+        print(file +' shape: ' + str(img.shape))
 
 convert(args)
 
