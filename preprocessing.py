@@ -6,17 +6,17 @@ import numpy as np
 
 def proprecessing(image_path, save_folder):
 
-    if not os.path.exists("data/"+save_folder):
-        os.mkdir("data/"+save_folder)
-    filelist = os.listdir(image_path)
-    filelist = [item for item in filelist if 'volume' in item]
-    for file in filelist:
-        img, img_header = load(image_path+file)
-        img[img < -200] = -200
-        img[img > 250] = 250
-	img = np.array(img, dtype='float32')
-	print ("Saving image "+file)
-        save(img, "./data/" + save_folder + file)
+    #if not os.path.exists("data/"+save_folder):
+    #    os.mkdir("data/"+save_folder)
+    #filelist = os.listdir(image_path)
+    #filelist = [item for item in filelist if 'volume' in item]
+    #for file in filelist:
+    #    img, img_header = load(image_path+file)
+    #    img[img < -200] = -200
+    #    img[img > 250] = 250
+	#img = np.array(img, dtype='float32')
+	#print ("Saving image "+file)
+    #    save(img, "./data/" + save_folder + file)
 
 def generate_livertxt(image_path, save_folder):
     if not os.path.exists("data/"+save_folder):
@@ -78,7 +78,7 @@ def generate_txt(image_path, save_folder):
         np.savetxt('data/myTrainingDataTxt/LiverBox/box_'+str(i)+'.txt', box,fmt='%d')
 
 
-proprecessing(image_path='data/TrainingData/', save_folder='myTrainingData/')
+#proprecessing(image_path='data/TrainingData/', save_folder='myTrainingData/')
 proprecessing(image_path='data/TestData/', save_folder='myTestData/')
 print ("Generate liver txt ")
 generate_livertxt(image_path='data/TrainingData/', save_folder='myTrainingDataTxt/')
