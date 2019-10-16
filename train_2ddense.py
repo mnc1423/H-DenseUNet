@@ -16,6 +16,7 @@ from keras.utils2.multi_gpu import make_parallel
 from denseunet import DenseUNet
 from skimage.transform import resize
 K.set_image_dim_ordering('tf')
+from keras.callbacks import TensorBoard
 
 #  global parameters
 parser = argparse.ArgumentParser(description='Keras 2d denseunet Training')
@@ -36,7 +37,6 @@ args = parser.parse_args()
 MEAN = args.mean
 thread_num = args.thread_num
 
-#liverlist = [32,34,38,41,47,87,89,91,105,106,114,115,119]
 def load_seq_crop_data_masktumor_try(Parameter_List):
     img = Parameter_List[0]
     tumor = Parameter_List[1]
@@ -109,7 +109,7 @@ def generate_arrays_from_file(batch_size, trainidx, img_list, tumor_list, tumorl
             minindex = minindex_list[count]
             maxindex = maxindex_list[count]
             num = np.random.randint(0,6)
-            if num < 3: #or (count in liverlist):
+            if num < 3: 
                 lines = liverlines[count]
                 numid = liveridx[count]
             else:
@@ -183,7 +183,7 @@ def train_and_predict():
     model.load_weights(args.model_weight, by_name=True)
     model = make_parallel(model, args.b / 10, mini_batch=10)
     sgd = SGD(lr=1e-3, momentum=0.9, nesterov=True)
-    model.compile(optimizer=sgd, loss=[weighted_crossentropy_2ddense])
+    model.compile(optimizer=sgd, loss=[weighted_crossentropy_2ddense], metrics=['accuracy'])
 
     trainidx, img_list, tumor_list, tumorlines, liverlines, tumoridx, liveridx, minindex_list, maxindex_list = load_fast_files(args)
 
@@ -203,6 +203,9 @@ def train_and_predict():
         if os.path.exists(args.save_path + "/history/lossepoch.txt"):
             os.remove(args.save_path + '/history/lossepoch.txt')
 
+    tensor_board = TensorBoard(logdir='./logs', histogram_freq=0, write_graph=True, write_images=False)
+
+
     model_checkpoint = ModelCheckpoint(args.save_path + '/model/weights.{epoch:02d}-{loss:.2f}.hdf5', monitor='loss', verbose = 1,
                                        save_best_only=False,save_weights_only=False,mode = 'min', period = 1)
 
@@ -210,7 +213,7 @@ def train_and_predict():
     steps = 27386 / args.b
     model.fit_generator(generate_arrays_from_file(args.b, trainidx, img_list, tumor_list, tumorlines, liverlines, tumoridx,
                                                   liveridx, minindex_list, maxindex_list),steps_per_epoch=steps,
-                                                    epochs= 6000, verbose = 1, callbacks = [model_checkpoint], max_queue_size=10,
+                                                    epochs= 6000, verbose = 1, callbacks = [model_checkpoint, tensor_board], max_queue_size=10,
                                                     workers=3, use_multiprocessing=True)
 
     print ('Finised Training .......')
