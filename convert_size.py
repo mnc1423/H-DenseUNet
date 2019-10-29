@@ -18,8 +18,7 @@ def convert(args):
     filelist = [item for item in filelist if 'segmentation' in item]
     for file in filelist:
         img = nib.load('image/segmentation/'+ file).get_data()
-        print(img.shape)
-        
+        print(img.shape)        
         img = np.swapaxes(img, 0, 2)
         img = np.array(img, dtype='float32')
         print(img.shape)
