@@ -128,7 +128,7 @@ def generate_arrays_from_file(batch_size, trainidx, img_list, tumor_list, tumorl
 
 def load_fast_files(args):
 
-    trainidx = list(range(131))
+    trainidx = list(range(150))
     img_list = []
     tumor_list = []
     minindex_list = []
@@ -137,10 +137,8 @@ def load_fast_files(args):
     tumoridx = []
     liveridx = []
     liverlines = []
-    for idx in xrange(131):
+    for idx in xrange(150):
         img, img_header = load(args.data+ '/myTrainingData/volume-' + str(idx) + '.nii')
-        print(img_liver.shape)
-        print(img_kidney.shape)
         
         tumor, tumor_header = load(args.data + '/myTrainingData/segmentation-' + str(idx) + '.nii')
 
@@ -173,6 +171,53 @@ def load_fast_files(args):
 
     return trainidx, img_list, tumor_list, tumorlines, liverlines, tumoridx, liveridx, minindex_list, maxindex_list
 
+def val_load_fast_files(args):
+
+    vtrainidx = list(range(150,180))
+    vimg_list = []
+    vtumor_list = []
+    vminindex_list = []
+    vmaxindex_list = []
+    vtumorlines = []
+    vtumoridx = []
+    vliveridx = []
+    vliverlines = []
+    for idx in xrange(150,180):
+        img, img_header = load(args.data+ '/myTrainingData/volume-' + str(idx) + '.nii')
+        
+        tumor, tumor_header = load(args.data + '/myTrainingData/segmentation-' + str(idx) + '.nii')
+
+        vimg_list.append(img)
+        vtumor_list.append(tumor)
+
+        maxmin = np.loadtxt(args.data + '/myTrainingDataTxt/LiverBox/box_' + str(idx) + '.txt', delimiter=' ')
+        minindex = maxmin[0:3]
+        maxindex = maxmin[3:6]
+        minindex = np.array(minindex, dtype='int')
+        maxindex = np.array(maxindex, dtype='int')
+        minindex[0] = max(minindex[0] - 3, 0)
+        minindex[1] = max(minindex[1] - 3, 0)
+        minindex[2] = max(minindex[2] - 3, 0)
+        maxindex[0] = min(img.shape[0], maxindex[0] + 3)
+        maxindex[1] = min(img.shape[1], maxindex[1] + 3)
+        maxindex[2] = min(img.shape[2], maxindex[2] + 3)
+        vminindex_list.append(minindex)
+        vmaxindex_list.append(maxindex)
+        f1 = open(args.data + '/myTrainingDataTxt/TumorPixels/tumor_' + str(idx) + '.txt', 'r')
+        tumorline = f1.readlines()
+        vtumorlines.append(tumorline)
+        vtumoridx.append(len(tumorline))
+        f1.close()
+        f2 = open(args.data + '/myTrainingDataTxt/LiverPixels/liver_' + str(idx) + '.txt', 'r')
+        liverline = f2.readlines()
+        vliverlines.append(liverline)
+        vliveridx.append(len(liverline))
+        f2.close()
+
+    return vtrainidx, vimg_list, vtumor_list, vtumorlines, vliverlines, vtumoridx, vliveridx, vminindex_list, vmaxindex_list
+
+
+
 def train_and_predict():
 
     print('-'*30)
@@ -185,7 +230,12 @@ def train_and_predict():
     sgd = SGD(lr=1e-3, momentum=0.9, nesterov=True)
     model.compile(optimizer=sgd, loss=[weighted_crossentropy_2ddense], metrics=['accuracy'])
 
+    #Load Training Data
     trainidx, img_list, tumor_list, tumorlines, liverlines, tumoridx, liveridx, minindex_list, maxindex_list = load_fast_files(args)
+    
+    #Load Validation Data
+    vtrainidx, vimg_list, vtumor_list, vtumorlines, vliverlines, vtumoridx, vliveridx, vminindex_list, vmaxindex_list = val_load_fast_files(args)
+
 
     print('-'*30)
     print('Fitting model......')
@@ -212,9 +262,11 @@ def train_and_predict():
 
     steps = 27386 / args.b
     model.fit_generator(generate_arrays_from_file(args.b, trainidx, img_list, tumor_list, tumorlines, liverlines, tumoridx,
-                                                  liveridx, minindex_list, maxindex_list),steps_per_epoch=steps,
-                                                    epochs= 6000, verbose = 1, callbacks = [model_checkpoint, tensor_board], max_queue_size=10,
-                                                    workers=3, use_multiprocessing=True)
+                                                  liveridx, minindex_list, maxindex_list), steps_per_epoch=steps,
+                                                    epochs= 6000, verbose = 1, callbacks = [model_checkpoint, tensor_board], 
+                                                    validation_data = generate_arrays_from_file(args.b / 2, vtrainidx, vimg_list, vtumor_list, vtumorlines, vliverlines, vtumoridx,
+                                                 vliveridx, vminindex_list, vmaxindex_list), validation_steps=30, validation_freq=5, 
+                                                    max_queue_size=10, workers=3, use_multiprocessing=True)
 
     print ('Finised Training .......')
 
